@@ -25,7 +25,7 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   //Write your code here
-  return res.send(express.json.stringify(books, null, 2));  
+  return res.send(JSON.stringify(books, null, 2));  
 });
 
 // Get book details based on ISBN
@@ -53,7 +53,6 @@ public_users.get('/author/:author',function (req, res) {
         filteredBooks[isbn] = books[isbn];
     }
   })
-
   return res.json(filteredBooks);
 });
 
@@ -78,11 +77,17 @@ public_users.get('/review/:isbn',function (req, res) {
   //Write your code here
   const isbn = req.params.isbn;
 
-  if (books[isbn]){
-    return res.json(books[isbn].reviews);
-  } else {
-    return res.status(404).json({ message: "Book not found" })
+  if (!books[isbn]) {
+    return res.status(404).json({ message: "Book not found" });
   }
+  
+  const reviews = books[isbn].reviews;
+
+  if (Object.keys(reviews).length === 0) {
+    return res.json({ message: "No reviews found for this book." });
+  }
+
+    return res.json(reviews);
 });
 
 module.exports.general = public_users;
